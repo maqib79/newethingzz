@@ -1,0 +1,2 @@
+RewriteEngine on
+RewriteRule    ^user/([a-zA-Z0-9_.-]+)/?$    user.php?id=$1    [NC,L]    # Handle product requests

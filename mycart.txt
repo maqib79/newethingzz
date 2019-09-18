@@ -1,0 +1,232 @@
+
+function refreshmycart(){
+               $.ajax({    //create an ajax request to display.php
+       type: "GET",
+       url: "mycart.php",             
+       dataType: "html",   //expect html to be returned                
+       success: function(response){                    
+           $("#mycartlist").html(response); 
+           //alert(response);
+           var totalVal = 0,
+    iCount = $('#pricetable').find('td.price').length;
+$('#pricetable').find('td.price').each(function(i,val){
+totalVal = totalVal + parseInt($(val).text());
+urlchacker(totalVal);
+//var x = document.getElementsByClassName("totalamount");
+ // x[0].innerHTML = totalVal;
+  //x[1].innerHTML = totalVal;
+  //x[2].innerHTML = totalVal;
+
+  //x[3].innerHTML = totalVal;
+  //x[4].innerHTML = totalVal;
+ //document.getElementById("totalamountwithflat").value=totalVal;
+
+    
+});
+       }
+
+   });
+}
+
+function urlchacker(totalVal){
+    var filename = location.pathname.substr(location.pathname.lastIndexOf("/")+1);
+    if(filename ==='index.php' || filename ==='' ){
+    var x = document.getElementsByClassName("totalamount");
+  x[0].innerHTML = totalVal;
+  x[1].innerHTML = totalVal;
+  x[2].innerHTML = totalVal;
+
+}
+else if(filename==='checkout.php'){
+     var e = document.getElementsByClassName("totalamount");
+  e[0].innerHTML = totalVal;
+  e[1].innerHTML = totalVal;
+  e[2].innerHTML = totalVal;
+     e[3].innerHTML = totalVal;
+  e[4].innerHTML = totalVal;
+
+ document.getElementById("totalamountwithflat").value=totalVal;
+
+    
+}
+
+else{
+    var e = document.getElementsByClassName("totalamount");
+  e[0].innerHTML = totalVal;
+  e[1].innerHTML = totalVal;
+  e[2].innerHTML = totalVal;
+     e[3].innerHTML = totalVal;
+  e[4].innerHTML = totalVal;
+    
+}
+
+}
+
+
+function cartlist(){
+               $.ajax({    //create an ajax request to display.php
+       type: "GET",
+       url: "cartlist.php",             
+       dataType: "html",   //expect html to be returned                
+       success: function(response){                    
+           $("#showcart").html(response); 
+}
+});
+}
+
+setInterval(function(){
+refreshmycart();   },500);
+
+window.onload=function(){
+    
+    refreshmycart();
+    cartlist();
+}
+   
+
+$(document).ready(function(){
+
+
+$('.postorder').click(function(){
+    
+var name= $('#input-payment-lastname').val();
+var email = $('#input-payment-email').val();
+var phone = $('#input-payment-telephone').val();
+var address= $('#input-payment-address-1').val();
+var city = $('#input-payment-city').val();
+var country= $('#input-payment-country').val();
+var province= $('#input-payment-province').val();
+var cod= document.querySelector('input[name="COD"]:checked').value;
+var message= $('#confirm_comment').val();
+var flatcharges= $('#valueofcharges').val();
+var total =$('#totalamountwithflat').val();
+
+    if(name === '' || email === '' || phone ==='' || address==='' || city==='' || country=== '' || province=== ''  ){
+
+        $('#bs-example-modal-sm').modal('show');
+        return false;
+    }
+    else{
+    
+    $.ajax({
+        type: 'POST',
+        url: 'postorder.php',
+        data: ({
+                name: name, 
+                 email : email,
+                 phone :phone,
+                 address: address,
+                 city : city,
+             country: country,
+             province:province,
+                 cod: cod,
+                 message: message,
+             flatcharges: flatcharges,
+             total:total
+ 
+        }),
+        cache :false,
+        success: function(response){
+            if(response ==='uploaded'){
+            window.location.replace("http://a.ethingzz.com/ethingzz/sucess.php");
+        }
+        }
+        
+    });
+    }
+    
+});
+    
+    
+     $("#ordertable").on("click",".deleteorder",function(){
+    var orderiddelete= $(this).attr("id");
+var parent_tr = $(this).closest( "tr" );
+    
+    $.ajax({
+        type: "POST",
+        url:"deletcart.php",
+        data:({
+            orderiddelete:orderiddelete
+        }),
+        cache: false,
+        success: function(response){
+                parent_tr.fadeOut( 1000, function() {
+            $(this).remove();
+
+            });
+
+        }
+    });
+        
+        
+    });
+    
+     $("#ordertable").on("click",".update",function(){
+    var orderiddelete= $(this).attr("id");
+    var quantity= $(this).closest('tr').find('td').eq(2).find('input').val();
+var parent_tr = $(this).closest( "tr" );
+    
+    $.ajax({
+        type: "POST",
+        url:"updatecart.php",
+        data:({
+            orderiddelete:orderiddelete,
+            quantity:quantity,
+        }),
+        cache: false,
+        success: function(response){
+                parent_tr.fadeIn( 1000, function() {
+            $(this).addClass("highlighcss");
+                });
+                   cartlist();
+
+    
+    
+                            
+
+
+        }
+    });
+        
+        
+    });
+    
+    
+    
+    $('.addtocart').click(function(){
+
+        var proname= $('#proname').val();
+        var quantity= $('#quantity').val();
+        var productid= $('#productid').val();
+        var image= $('#fetchimage').val();
+        var price= $('#priceofproduct').val();
+
+  
+   $.ajax({
+                type: "POST",
+                url: "addtocart.php",
+                data: ({
+                    proname:proname,
+                    productid:productid,
+                    quantity: quantity,
+                    price:price,
+                    image:image
+                }),
+                 async : false,
+                cache: false,
+                success: function(response) {
+            
+        if(response =='uploaded'){
+
+	parent.addProductNotice('Product added to Cart', '<img src=' + image + ' alt="">', '<h3><a href="#"> '+ proname +'"</a> added to <a href="#">shopping cart</a>!</h3>', 'success');
+
+            }
+  
+}
+    });
+    
+});
+
+    
+});
+
